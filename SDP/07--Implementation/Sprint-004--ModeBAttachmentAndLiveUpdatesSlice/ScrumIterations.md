@@ -1,0 +1,33 @@
+# Scrum Iterations
+
+## Iteration 001
+- Status: planned
+- Scrum meeting note:
+  - Sprint 004 exists to resolve the central Mode B uncertainty instead of letting attachment fidelity remain implicit.
+  - This iteration defines the truth model for attachment and updates before transport implementation starts.
+- Objective:
+  - formalize the attachment-state vocabulary and the update event contract that later live-update work will implement
+- Entry criteria:
+  - Sprint 003 provides a send-capable baseline
+  - the canonical session and thread model already exists but needs attachment fidelity hardening
+- Target deliverables:
+  - explicit attached, mirrored, and fallback semantics
+  - capability and attachability fields in the canonical model
+  - bridge event contract for live updates and polling fallback
+- Sprint phases touched:
+  - Phase 1 - Attachment Semantics and Capability Propagation
+  - Phase 2 - Event Transport and Polling Abstraction
+- Detailed TODO:
+  - [ ] Finalize the definitions of attached, mirrored, and fallback modes.
+  - [ ] Add capability and attachability fields to the canonical session and thread models.
+  - [ ] Define how the bridge reports partial or downgraded attachment support.
+  - [ ] Define the event payload shape for thread updates.
+  - [ ] Define the event payload shape for message additions and message chunks.
+  - [ ] Define polling fallback semantics so the UI sees one update model.
+  - [ ] Record protocol unknowns that could still block true live attachment.
+- Verification plan:
+  - confirm the model is expressive enough to distinguish real attachment from mirror or fallback behavior
+  - confirm the event contract can support both subscription and polling implementations
+  - confirm unresolved protocol gaps are explicit rather than hidden
+- Expected handoff-ready state:
+  - Sprint 004 Iteration 002 can implement live updates without redesigning the attachment model

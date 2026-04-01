@@ -1,0 +1,37 @@
+# Scrum Iterations
+
+## Iteration 001
+- Status: planned
+- Scrum meeting note:
+  - Sprint 001 is the active bootstrap surface for bridge and discovery work.
+  - This iteration must establish the local port and adapter baseline before later sprints start depending on guessed conventions.
+- Objective:
+  - define the first bridge boundary, reserve local dev ports, and reduce the discovery unknowns enough for runtime bootstrap work to start safely
+- Entry criteria:
+  - mandate, study, requirements, and architecture documents are present
+  - no prior implementation baseline is assumed
+- Target deliverables:
+  - reserved local port decision: Vite `5280`, bridge API `3180`
+  - documented local Codex surface reconnaissance notes
+  - first adapter contract, capability flags, and error model
+- Sprint phases touched:
+  - Phase 1 - Sprint Activation and Port Baseline
+  - Phase 2 - Local Codex Surface Reconnaissance
+  - Phase 3 - Adapter Contract and Capability Model
+- Detailed TODO:
+  - [ ] Confirm Sprint 001 as the active bootstrap execution surface.
+  - [ ] Record Vite dev port `5280` as the reserved non-default UI port.
+  - [ ] Record bridge API port `3180` as the initial runtime port.
+  - [ ] Identify the first reachable local Codex surface and its likely transport shape.
+  - [ ] Record which protocol assumptions are verified versus provisional.
+  - [ ] Record local auth-handling guardrails for discovery work.
+  - [ ] Define the first adapter interface for discovery, read, send, and optional subscribe.
+  - [ ] Define capability flags for attach, streaming, and workspace hints.
+  - [ ] Define the initial normalized error model for bridge consumers.
+  - [ ] Define the expected output shape for session discovery.
+- Verification plan:
+  - confirm the port decision is reflected in the sprint planning surface
+  - confirm the adapter contract is specific enough to drive bridge bootstrap work
+  - confirm discovery assumptions are documented clearly enough for a later implementation pass
+- Expected handoff-ready state:
+  - Sprint 001 Iteration 002 can begin bridge runtime bootstrap without re-deciding ports or adapter basics
