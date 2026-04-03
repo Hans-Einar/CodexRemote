@@ -31,3 +31,80 @@
   - confirm unresolved protocol gaps are explicit rather than hidden
 - Expected handoff-ready state:
   - Sprint 004 Iteration 002 can implement live updates without redesigning the attachment model
+
+## Iteration 002
+- Status: in_progress
+- Scrum meeting note:
+  - The next concrete step is to replace the fixture-only bridge path with a real local app-server read path over the officially documented `stdio` transport.
+  - The local `.codex` state adapter now exists as a mirror fallback, but this iteration should prefer the live `stdio` path when it works.
+- Objective:
+  - implement the first `stdio` app-server adapter for live local session/thread reads, surface the active adapter clearly, and begin live send support
+- Entry criteria:
+  - the local-state adapter is available as a fallback
+  - the project registry is in place so selected projects can scope session discovery
+- Target deliverables:
+  - validated transport findings for the local app-server surface
+  - first live adapter for session/thread enumeration
+  - active adapter reporting in the bridge
+- Sprint phases touched:
+  - Phase 1 - Attachment Semantics and Capability Propagation
+  - Phase 3 - Real Session Validation Matrix
+- Detailed TODO:
+  - [x] Validate the official Codex app-server `stdio` transport on this host.
+  - [x] Generate and inspect the official app-server schema and TypeScript bindings.
+  - [x] Implement the first live app-server adapter for read-only metadata access over `stdio`.
+  - [x] Keep the local-state adapter as the fallback mirror path.
+  - [x] Define and document adapter selection order.
+  - [x] Surface the active adapter and capability state clearly in the UI.
+  - [x] Implement the first live send path over `stdio`.
+  - [x] Refine the shell toward the desktop-app workflow while keeping the workspace mode available.
+  - [x] Record real findings in `implementationNotes.md` after verification.
+  - [x] Fix existing-thread continuation by resuming persisted threads before sending.
+  - [x] Add bounded/tail-style conversation history loading in the bridge API and UI.
+  - [x] Add polling-based live refresh so desktop-side activity appears in CodexRemote without full reload.
+  - [x] Add shared per-project active-thread state so connected web UIs converge on the same conversation.
+  - [x] Reconcile shared thread state against the most recently updated project thread for persistence-based desktop/web continuity.
+  - [ ] Continue from polling-based completion into notification-backed live updates.
+- Verification plan:
+  - verify that the bridge can prefer a live local source when available
+  - verify that the app still falls back cleanly to the local-state mirror or fixture when needed
+  - verify that the active adapter label is surfaced clearly
+  - verify that a live `thread/start` plus `turn/start` round-trip completes against the installed Codex binary on this host
+
+## Iteration 003
+- Status: planned
+- Scrum meeting note:
+  - The next product-critical step is to make a conversation feel like the same conversation across Codex Desktop and every connected CodexRemote browser, not just a nearby project thread.
+  - This iteration should focus on cross-platform continuity and live-follow behavior before deeper diff or workspace polish.
+- Objective:
+  - establish a dependable cross-platform thread-sync model so a conversation started in Codex Desktop or CodexRemote can be followed and continued seamlessly across desktop and all connected web UIs
+- Entry criteria:
+  - Sprint 004 Iteration 002 provides real `stdio` read/send support
+  - a shared per-project active-thread state already exists in SQLite
+  - polling-based refresh is available as the current baseline
+- Target deliverables:
+  - an explicit project-to-active-thread continuity model
+  - shared active-thread convergence across connected web UIs
+  - desktop-originated conversation continuity that is reflected in CodexRemote without reload
+  - live-follow behavior for assistant progress that is honest about whether it is true streaming or polling-backed
+- Sprint phases touched:
+  - Phase 2 - Event Transport and Polling Abstraction
+  - Phase 3 - Real Session Validation Matrix
+  - Phase 4 - UX Truthfulness and Status Hardening
+- Detailed TODO:
+  - [x] Define the canonical continuity rule for how a project chooses its active thread when desktop and web activity both exist.
+  - [ ] Distinguish explicitly between persisted-thread continuity and true in-memory desktop-tab attachment.
+  - [x] Tighten the shared active-thread state so all connected web UIs converge quickly and predictably on the same thread.
+  - [x] Detect when a desktop-originated turn advances a different project thread and promote that thread into the shared active-thread state.
+  - [x] Add live-follow updates for the active conversation so a phone browser can observe assistant progress while the work was started elsewhere.
+  - [ ] Define and implement stale-state and handoff rules so rapid switching between desktop and web does not cause thread thrash.
+  - [ ] Add clear UI signaling for which thread is being followed and why it became the active shared conversation.
+  - [ ] Verify that sending from Codex Desktop can be observed from CodexRemote and that sending from CodexRemote can then be continued from another connected web UI.
+  - [ ] Record any remaining gaps between “shared persisted thread” and “same exact live desktop tab” in `implementationNotes.md`.
+- Verification plan:
+  - verify that two separate CodexRemote browsers converge on the same active project thread without manual reload
+  - verify that a prompt started in Codex Desktop becomes visible in CodexRemote within the expected polling or update window
+  - verify that a prompt started in CodexRemote can be continued from another browser on the same host/session model
+  - verify that the UI communicates whether the user is seeing true live streaming or polling-backed live-follow behavior
+- Expected handoff-ready state:
+  - Sprint 004 Iteration 004 can focus on richer live-update fidelity, truthfulness, and remaining desktop-versus-web residual gaps instead of basic continuity mechanics

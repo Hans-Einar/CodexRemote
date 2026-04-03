@@ -1,4 +1,4 @@
-import Editor from "@monaco-editor/react";
+import Editor, { DiffEditor } from "@monaco-editor/react";
 
 import type { WorkspaceFile } from "../shared/contracts";
 
@@ -8,6 +8,8 @@ function languageForPath(relativePath: string) {
   switch (extension) {
     case "css":
       return "css";
+    case "diff":
+      return "diff";
     case "html":
       return "html";
     case "js":
@@ -29,14 +31,41 @@ function languageForPath(relativePath: string) {
 }
 
 export function EditorPane({
+  originalValue,
   file,
   onChange,
+  readOnly = false,
   value
 }: {
+  originalValue?: string | null;
   file: WorkspaceFile;
   onChange: (value: string) => void;
+  readOnly?: boolean;
   value: string;
 }) {
+  if (typeof originalValue === "string") {
+    return (
+      <div className="editor-pane__surface">
+        <DiffEditor
+          height="100%"
+          language={languageForPath(`${file.relativePath}.diff`)}
+          modified={value}
+          options={{
+            automaticLayout: true,
+            minimap: {
+              enabled: false
+            },
+            readOnly: true,
+            renderSideBySide: false,
+            scrollBeyondLastLine: false
+          }}
+          original={originalValue}
+          theme="vs-dark"
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="editor-pane__surface">
       <Editor
@@ -48,6 +77,7 @@ export function EditorPane({
           minimap: {
             enabled: false
           },
+          readOnly,
           scrollBeyondLastLine: false
         }}
         path={file.relativePath}

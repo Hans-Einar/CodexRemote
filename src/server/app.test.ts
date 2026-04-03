@@ -49,8 +49,10 @@ describe("createApp", () => {
 
   afterEach(async () => {
     for (const auxiliaryApp of auxiliaryApps) {
+      auxiliaryApp.locals.authStore.close();
       auxiliaryApp.locals.projectRegistry.close();
     }
+    app.locals.authStore.close();
     app.locals.projectRegistry.close();
     await fs.rm(workspaceRoot, { force: true, recursive: true });
   });
@@ -80,6 +82,22 @@ describe("createApp", () => {
         })
       ])
     );
+  });
+
+  it("returns runtime options and usage defaults for the active adapter", async () => {
+    const response = await request(app).get("/api/runtime");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      accessModes: expect.arrayContaining(["read-only", "workspace-write", "danger-full-access"]),
+      defaultAccessMode: "workspace-write",
+      defaultModelId: "gpt-5.4",
+      models: expect.arrayContaining([
+        expect.objectContaining({
+          id: "gpt-5.4"
+        })
+      ])
+    });
   });
 
   it("creates and persists shared project records in SQLite", async () => {
@@ -125,6 +143,47 @@ describe("createApp", () => {
     expect(response.body.messages[0]).toMatchObject({
       role: "system"
     });
+  });
+
+  it("supports tailed thread reads while preserving the full message count", async () => {
+    const response = await request(app)
+      .get("/api/threads/thread-bridge-bootstrap")
+      .query({
+        limit: 1
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body.messageCount).toBe(2);
+    expect(response.body.messages).toHaveLength(1);
+    expect(response.body.messages[0]).toMatchObject({
+      role: "assistant"
+    });
+  });
+
+  it("sends a prompt through the thread route and returns the updated thread", async () => {
+    const projectsResponse = await request(app).get("/api/projects");
+    const projectId = projectsResponse.body.defaultProjectId as string;
+
+    const response = await request(app).post("/api/threads/send").send({
+      message: "Plan the next shell step",
+      projectId,
+      threadId: "thread-bridge-bootstrap"
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body.thread.id).toBe("thread-bridge-bootstrap");
+    expect(response.body.messages).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          content: "Plan the next shell step",
+          role: "user"
+        }),
+        expect.objectContaining({
+          content: "Fixture adapter captured: Plan the next shell step",
+          role: "assistant"
+        })
+      ])
+    );
   });
 
   it("returns nested tree nodes and filters ignored directories", async () => {
@@ -240,11 +299,15 @@ describe("createApp", () => {
     expect(response.body.fileStatuses).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
+          additions: 1,
           badges: expect.arrayContaining(["M"]),
+          deletions: 1,
           relativePath: "README.md"
         }),
         expect.objectContaining({
+          additions: 1,
           badges: expect.arrayContaining(["?"]),
+          deletions: 0,
           relativePath: "docs/todo.md"
         })
       ])
@@ -257,6 +320,35 @@ describe("createApp", () => {
         })
       ])
     );
+  });
+
+  it("returns a repository diff for changed files", async () => {
+    await runGit(["init", "-b", "main"], workspaceRoot);
+    await runGit(["config", "user.email", "codex@example.com"], workspaceRoot);
+    await runGit(["config", "user.name", "Codex Remote"], workspaceRoot);
+    await runGit(["add", "."], workspaceRoot);
+    await runGit(["commit", "-m", "Initial baseline"], workspaceRoot);
+    await fs.writeFile(path.join(workspaceRoot, "README.md"), "# Overview\n\nDiff preview content.\n", "utf8");
+
+    const gitApp = createApp({
+      apiPort: DEFAULT_API_PORT,
+      codexAdapter: createFixtureCodexAdapter(),
+      projectDbPath,
+      vitePort: DEFAULT_VITE_PORT,
+      workspaceRoot
+    });
+    auxiliaryApps.push(gitApp);
+
+    const projectsResponse = await request(gitApp).get("/api/projects");
+    const projectId = projectsResponse.body.defaultProjectId as string;
+    const response = await request(gitApp).get("/api/git/diff").query({
+      path: "README.md",
+      projectId
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body.relativePath).toBe("README.md");
+    expect(response.body.diff).toContain("Diff preview content.");
   });
 
   it("supports a basic git workflow for stage, commit, branch create, and checkout", async () => {

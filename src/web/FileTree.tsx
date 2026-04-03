@@ -22,18 +22,33 @@ function collectAncestorIds(nodes: WorkspaceTreeNode[], targetPath: string, trai
 
 export function FileTree({
   activeFilePath,
+  ariaLabel = "Workspace files",
+  defaultExpandedIds,
   fileBadgeMap,
   folderBadgeMap,
   nodes,
   onSelectFile
 }: {
   activeFilePath: string | null;
+  ariaLabel?: string;
+  defaultExpandedIds?: string[];
   fileBadgeMap: Map<string, string[]>;
   folderBadgeMap: Map<string, string[]>;
   nodes: WorkspaceTreeNode[];
   onSelectFile: (relativePath: string) => void;
 }) {
   const [expandedIds, setExpandedIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!defaultExpandedIds || defaultExpandedIds.length === 0) {
+      return;
+    }
+
+    setExpandedIds((current) => {
+      const merged = new Set([...current, ...defaultExpandedIds]);
+      return Array.from(merged);
+    });
+  }, [defaultExpandedIds]);
 
   const activeAncestors = useMemo(() => {
     if (!activeFilePath) {
@@ -61,7 +76,7 @@ export function FileTree({
   }
 
   return (
-    <div className="file-tree" role="tree" aria-label="Workspace files">
+    <div className="file-tree" role="tree" aria-label={ariaLabel}>
       {nodes.map((node) => (
         <TreeNodeRow
           activeFilePath={activeFilePath}

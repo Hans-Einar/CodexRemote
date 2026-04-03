@@ -115,7 +115,21 @@ Detailed TODO:
 - [ ] Define polling fallback semantics so the UI sees one update model.
 - [ ] Capture any unresolved protocol limitations that affect live attachment.
 
-### Iteration 002 - Live Update Implementation
+### Iteration 002 - Live App-Server Discovery and Read Path
+Focus:
+- connect to the official local Codex app-server over `stdio` for real session and thread reads, surface the active live adapter clearly in the UI, and begin live send support while retaining the local-state adapter as fallback
+
+Detailed TODO:
+- [x] Validate the official Codex app-server transport surface and generated protocol artifacts.
+- [x] Implement a `stdio` app-server adapter that can initialize and enumerate sessions/threads.
+- [x] Compare `stdio` app-server reads against the existing local-state adapter output.
+- [x] Compare live app-server reads against the existing local-state adapter output.
+- [x] Define adapter selection order: live app-server first, local-state mirror second, fixture last.
+- [x] Expose the active adapter and capability state clearly in the API and UI.
+- [x] Implement the first live send path against the `stdio` app-server adapter.
+- [x] Refine the shell so the main mode switch is always visible and the desktop layout feels closer to the Codex desktop mental model.
+
+### Iteration 003 - Live Update Implementation
 Focus:
 - implement subscriptions where possible and polling where necessary behind one UI-facing shape
 
@@ -126,7 +140,19 @@ Detailed TODO:
 - [ ] Surface partial assistant output when the underlying transport supports it.
 - [ ] Verify conversation updates without full-page reloads.
 
-### Iteration 003 - Real-Session Validation and UX Truthfulness
+### Iteration 004 - Cross-Platform Thread Continuity and Live Reasoning Sync
+Focus:
+- make a conversation feel like the same conversation across Codex Desktop and all connected CodexRemote browsers, so users can start on one surface and follow or continue on another
+
+Detailed TODO:
+- [x] Define the project-to-active-thread continuity rule across desktop and web activity.
+- [x] Make the shared active-thread state converge predictably across all connected web UIs.
+- [x] Promote the most recently advanced desktop-originated project thread into the shared active-thread state when appropriate.
+- [x] Add live-follow updates for the active conversation so phone browsers can observe assistant progress started elsewhere.
+- [ ] Add UI truthfulness around whether the user is following a persisted shared thread or a truly attached live thread.
+- [ ] Verify desktop-to-web and web-to-web continuity using real Codex project threads.
+
+### Iteration 005 - Real-Session Validation and UX Truthfulness
 Focus:
 - validate the live behavior against real sessions and ensure the UI communicates that behavior honestly
 

@@ -6,6 +6,7 @@ Current local baseline:
 
 - local bridge API with a fixture Codex adapter
 - SQLite-backed persistent project registry shared by browsers on the same host
+- opt-in Google OAuth auth for CodexRemote itself
 - Vite web shell on port `5280`
 - bridge API on port `3180`
 - project selector and add-project flow
@@ -21,6 +22,24 @@ Current local baseline:
 - resizable conversation/workspace split and resizable explorer/editor split
 - collapsible explorer and terminal rails
 - compact Zen mode verified against the current workspace layout path
+
+## Auth configuration
+
+To require login for CodexRemote itself, set:
+
+```bash
+CODEXREMOTE_AUTH_MODE=required
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+GOOGLE_REDIRECT_URI=...
+CODEXREMOTE_BOOTSTRAP_ADMIN_EMAILS=you@example.com
+```
+
+Notes:
+
+- Google OAuth here protects CodexRemote itself, not OpenAI/Codex login.
+- `CODEXREMOTE_BOOTSTRAP_ADMIN_EMAILS` seeds the initial allowed admin users by email.
+- without `CODEXREMOTE_AUTH_MODE=required`, the app keeps the current unauthenticated local behavior.
 
 ## Run locally
 

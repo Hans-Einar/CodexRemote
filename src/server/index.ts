@@ -1,7 +1,7 @@
 import { createServer } from "node:http";
 import path from "node:path";
 
-import { createFixtureCodexAdapter } from "../bridge/fixtureCodexAdapter";
+import { selectCodexAdapter } from "../bridge/selectCodexAdapter";
 import { DEFAULT_API_PORT, DEFAULT_VITE_PORT } from "../config/ports";
 import { ProjectRegistry } from "../projects/projectRegistry";
 import { attachTerminalSocketServer } from "./attachTerminalSocketServer";
@@ -17,10 +17,11 @@ const projectRegistry = new ProjectRegistry({
     rootPath: workspaceRoot
   }
 });
+const codexAdapter = selectCodexAdapter();
 
 const app = createApp({
   apiPort: DEFAULT_API_PORT,
-  codexAdapter: createFixtureCodexAdapter(),
+  codexAdapter,
   projectRegistry,
   vitePort: DEFAULT_VITE_PORT,
   workspaceRoot
@@ -30,6 +31,8 @@ const server = createServer(app);
 const terminalManager = createTerminalManager(nodePtyProcessFactory);
 
 attachTerminalSocketServer({
+  authEnabled: app.locals.authConfig.mode === "required",
+  authStore: app.locals.authStore,
   projectRegistry,
   server,
   terminalManager

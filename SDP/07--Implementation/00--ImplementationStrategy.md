@@ -33,5 +33,6 @@ A sprint may lean heavily toward one layer when discovery or integration risk de
 2. `Sprint-002--ThreadReadAndWorkspaceSlice`
 3. `Sprint-003--ConversationAndPreviewSlice`
 4. `Sprint-004A--ProjectRegistryAndPersistenceSlice`
-5. `Sprint-004--ModeBAttachmentAndLiveUpdatesSlice`
-6. `Sprint-005--FallbackAndHardeningSlice`
+5. `Sprint-004B--AuthAndRemoteAccessSlice`
+6. `Sprint-004--ModeBAttachmentAndLiveUpdatesSlice`
+7. `Sprint-005--FallbackAndHardeningSlice`
